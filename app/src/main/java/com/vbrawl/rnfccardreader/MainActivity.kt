@@ -2,13 +2,10 @@ package com.vbrawl.rnfccardreader
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.nfc.NdefMessage
-import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
-import android.view.GestureDetector
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,9 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.content.IntentCompat
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.vbrawl.rnfccardreader.ui.theme.RNFCCardReaderTheme
+import com.vbrawl.rnfccardreader.ui.theme.MainUI
 
 
 class MainActivity : ComponentActivity() {
@@ -30,18 +26,14 @@ class MainActivity : ComponentActivity() {
     private var nfcAdapter: NfcAdapter? = null
     private var action: RNFCAction? = ReadAction()
 
-    private var sock: RNFCWebSocket? = null
-    private var url: String = "ws://192.168.1.24:8080"
+    var sock: RNFCWebSocket? = null
+    var url: String = "ws://127.0.0.1:8080"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RNFCCardReaderTheme {
-                NFCStateDisplay(
-                    state = "NFC Module!"
-                )
-            }
+            MainUI(this)
         }
 
         sock = RNFCWebSocket(url) { msg ->
@@ -69,6 +61,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        sock?.connect(url)
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -77,13 +74,15 @@ class MainActivity : ComponentActivity() {
 
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
         nfcAdapter?.enableForegroundDispatch(this, pendingIntent, null, null)
-
-        sock?.connect(url)
     }
 
     override fun onPause() {
         super.onPause()
         nfcAdapter?.disableForegroundDispatch(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
         sock?.disconnect()
     }
 
