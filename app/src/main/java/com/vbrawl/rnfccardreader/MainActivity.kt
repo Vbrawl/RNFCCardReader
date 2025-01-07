@@ -8,6 +8,7 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
+import android.view.GestureDetector
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,7 +31,7 @@ class MainActivity : ComponentActivity() {
     private var action: RNFCAction? = ReadAction()
 
     private var sock: RNFCWebSocket? = null
-    private val url: String = "ws://192.168.1.24:8080"
+    private var url: String = "ws://192.168.1.24:8080"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,11 +77,14 @@ class MainActivity : ComponentActivity() {
 
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
         nfcAdapter?.enableForegroundDispatch(this, pendingIntent, null, null)
+
+        sock?.connect(url)
     }
 
     override fun onPause() {
         super.onPause()
         nfcAdapter?.disableForegroundDispatch(this)
+        sock?.disconnect()
     }
 
     override fun onNewIntent(intent: Intent) {

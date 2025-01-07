@@ -6,23 +6,33 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 
-class RNFCWebSocket(val url: String, val reconnectionInterval: Int = 3, val onmsg: (msg: String) -> Unit = {}) : WebSocketListener() {
+class RNFCWebSocket(var url: String, val reconnectionInterval: Int = 3, val onmsg: (msg: String) -> Unit = {}) : WebSocketListener() {
     val httpClient = OkHttpClient()
     var sock: WebSocket? = null
+    var reconnect = false
 
     init {
         connect()
     }
 
-    private fun connect() {
+    fun connect(new_url: String? = null) {
+        if(new_url != null) { url = new_url }
         val request = Request.Builder().url(url).build()
 
         sock = httpClient.newWebSocket(request, this)
     }
 
-    private fun attemptReconnect() {
+    fun attemptReconnect() {
+        if(!reconnect) { return }
         Thread.sleep(1000 * reconnectionInterval.toLong())
+        if(!reconnect) { return }
         connect()
+    }
+
+    fun disconnect() {
+        reconnect = false
+        sock?.close(1000, "Closing")
+        sock = null
     }
 
     fun send(text: String) {
