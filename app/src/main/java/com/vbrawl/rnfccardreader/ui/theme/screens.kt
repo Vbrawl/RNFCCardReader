@@ -1,6 +1,5 @@
 package com.vbrawl.rnfccardreader.ui.theme
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,8 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
@@ -26,12 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -42,6 +37,12 @@ import com.vbrawl.rnfccardreader.MainActivity
 @Composable
 fun MainUI(activity: MainActivity) {
     val navController = rememberNavController()
+
+    navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        if (destination.route == "main")
+            { activity.sock?.connect(activity.url) }
+        else { activity.sock?.disconnect() }
+    }
 
     NavHost(
         navController=navController,
@@ -78,6 +79,7 @@ fun MainScreen(navController: NavController) {
 @Composable
 fun SettingsScreen(activity: MainActivity, navController: NavController) {
     var hostUrl by remember { mutableStateOf(activity.url) }
+
     RNFCCardReaderTheme {
         Scaffold(
             topBar = {
@@ -85,12 +87,7 @@ fun SettingsScreen(activity: MainActivity, navController: NavController) {
                     title = { Text("Settings") },
                     navigationIcon = {
                         OutlinedButton(
-                            onClick = {
-                                activity.url = hostUrl
-                                navController.popBackStack()
-                                activity.sock?.disconnect()
-                                activity.sock?.connect(activity.url)
-                            },
+                            onClick = { navController.popBackStack() },
                             contentPadding = PaddingValues(1.dp),
                             modifier = Modifier
                                 .size(48.dp)
@@ -121,6 +118,7 @@ fun SettingsScreen(activity: MainActivity, navController: NavController) {
                     singleLine = true,
                     onValueChange = {
                         hostUrl = it
+                        activity.url = it
                     }
                 )
             }

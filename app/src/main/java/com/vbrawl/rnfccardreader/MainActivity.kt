@@ -10,12 +10,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.core.content.IntentCompat
 import com.google.gson.JsonParser
 import com.vbrawl.rnfccardreader.ui.theme.MainUI
@@ -61,11 +55,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        sock?.connect(url)
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -79,11 +68,6 @@ class MainActivity : ComponentActivity() {
     override fun onPause() {
         super.onPause()
         nfcAdapter?.disableForegroundDispatch(this)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        sock?.disconnect()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -108,18 +92,5 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(this, "Error!", Toast.LENGTH_LONG).show()
             }
         }
-    }
-}
-
-@Composable
-fun NFCStateDisplay(state: String, modifier: Modifier = Modifier) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = state,
-            modifier = modifier
-        )
     }
 }

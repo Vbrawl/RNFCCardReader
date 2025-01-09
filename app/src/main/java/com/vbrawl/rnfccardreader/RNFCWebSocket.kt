@@ -20,6 +20,7 @@ class RNFCWebSocket(var url: String, val reconnectionInterval: Int = 3, val onms
         val request = Request.Builder().url(url).build()
 
         sock = httpClient.newWebSocket(request, this)
+        reconnect = true
     }
 
     fun attemptReconnect() {
@@ -51,6 +52,6 @@ class RNFCWebSocket(var url: String, val reconnectionInterval: Int = 3, val onms
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosed(webSocket, code, reason)
-        attemptReconnect()
+        reconnect = false
     }
 }
