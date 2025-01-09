@@ -6,7 +6,7 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 
-class RNFCWebSocket(var url: String, val reconnectionInterval: Int = 3, val onmsg: (msg: String) -> Unit = {}) : WebSocketListener() {
+class RNFCWebSocket(var url: String, val reconnectionInterval: Int = 1, val onmsg: (msg: String) -> Unit = {}) : WebSocketListener() {
     val httpClient = OkHttpClient()
     var sock: WebSocket? = null
     var reconnect = false
