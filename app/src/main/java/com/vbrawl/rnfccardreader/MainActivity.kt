@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
             action = when(targetAction) {
                 "READ" -> ReadAction()
                 "WRITE" -> WriteAction(obj.get("message").asJsonArray.toNdefMessage())
+                "FORCE_WRITE" -> ForceWrite(obj.get("message").asJsonArray.toNdefMessage())
                 "FORMAT" -> FormatAction()
                 else -> null
             }

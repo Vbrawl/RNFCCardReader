@@ -6,7 +6,7 @@ import android.nfc.Tag
 import android.nfc.tech.NdefFormatable
 import android.nfc.tech.NfcA
 
-class FormatAction : RNFCAction {
+open class FormatAction : RNFCAction {
     override var success = true
     override fun perform(tag: Tag): NdefMessage? {
         success = androidFormat(tag)
