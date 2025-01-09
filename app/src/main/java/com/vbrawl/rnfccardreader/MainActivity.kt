@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
             action = when(targetAction) {
                 "READ" -> ReadAction()
                 "WRITE" -> WriteAction(obj.get("message").asJsonArray.toNdefMessage())
+                "FORMAT" -> FormatAction()
                 else -> null
             }
 
@@ -72,13 +73,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if(intent.action != NfcAdapter.ACTION_NDEF_DISCOVERED) { return }
 
         val tag = IntentCompat.getParcelableExtra(intent, NfcAdapter.EXTRA_TAG, Tag::class.java) ?: return
-        val ndef = Ndef.get(tag) ?: return
 
         if(action != null) {
-            val ret = action!!.perform(ndef)
+            val ret = action!!.perform(tag)
             if(action!!.success) {
                 sock?.send(ret?.toJsonString() ?: "{}")
                 Toast.makeText(this,

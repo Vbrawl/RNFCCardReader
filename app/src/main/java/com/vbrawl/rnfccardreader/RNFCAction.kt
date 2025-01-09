@@ -1,9 +1,9 @@
 package com.vbrawl.rnfccardreader
 
 import android.nfc.NdefMessage
-import android.nfc.tech.Ndef
+import android.nfc.Tag
 
 interface RNFCAction {
     var success: Boolean
-    fun perform(ndef: Ndef) : NdefMessage?
+    fun perform(tag: Tag) : NdefMessage?
 }
