@@ -4,30 +4,56 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.Tag
-import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.content.IntentCompat
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.JsonParser
 import com.vbrawl.rnfccardreader.ui.theme.MainUI
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class MainActivity : ComponentActivity() {
 
+    companion object {
+        val URL_KEY = stringPreferencesKey("url")
+        val URL_DEFAULT = "ws://127.0.0.1:8080"
+    }
+
     private var nfcAdapter: NfcAdapter? = null
     private var action: RNFCAction? = ReadAction()
+    private val ds by preferencesDataStore(name="prefs")
 
     var sock: RNFCWebSocket? = null
-    var url: String = "ws://127.0.0.1:8080"
+    var url: String = URL_DEFAULT
+        set(value) {
+            field = value
+            CoroutineScope(Dispatchers.IO).launch {
+                ds.edit { preferences ->
+                    preferences[URL_KEY] = url
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MainUI(this)
+        }
+
+        runBlocking {
+            url = ds.data.map { preferences -> preferences[URL_KEY] }.first() ?: URL_DEFAULT
         }
 
         sock = RNFCWebSocket(url) { msg ->

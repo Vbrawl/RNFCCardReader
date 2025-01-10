@@ -23,10 +23,14 @@ class RNFCWebSocket(var url: String, val reconnectionInterval: Int = 1, val onms
 
     fun connect(new_url: String? = null) {
         if(new_url != null) { url = new_url }
-        val request = Request.Builder().url(url).build()
+        try {
+            val request = Request.Builder().url(url).build()
 
-        sock = httpClient.newWebSocket(request, this)
-        reconnect = true
+            sock = httpClient.newWebSocket(request, this)
+            reconnect = true
+        } catch(e: Exception) {
+            reconnect = false
+        }
     }
 
     fun attemptReconnect() {
