@@ -5,7 +5,8 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 class RNFCWebSocket(var url: String, val reconnectionInterval: Int = 1, val onmsg: (msg: String) -> Unit = {}) : WebSocketListener() {
     var httpClient: OkHttpClient
@@ -14,11 +15,9 @@ class RNFCWebSocket(var url: String, val reconnectionInterval: Int = 1, val onms
 
     init {
         httpClient = OkHttpClient.Builder()
-            .connectTimeout(1, TimeUnit.SECONDS)
-            .pingInterval(1, TimeUnit.SECONDS)
+            .connectTimeout(1.seconds.toJavaDuration())
+            .pingInterval(1.seconds.toJavaDuration())
             .build()
-
-        connect()
     }
 
     fun connect(new_url: String? = null) {
