@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
         if(action != null) {
             val ret = action!!.perform(tag)
             if(action!!.success) {
-                sock?.send(ret?.toJsonString() ?: "{}")
+                sock?.send(ret?.toJsonString() ?: "[]")
                 Toast.makeText(this,
                     when(ret) {
                         null -> "Success (No data)"
